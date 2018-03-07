@@ -35,6 +35,6 @@ if(argv.on) {
     const ps = spawn('networksetup', ['-setwebproxy', 'Wi-fi', argv.host || '127.0.0.1', argv.port || '3130']);
     logPs(ps);
 } else if(argv.off) {
-    const ps = spawn('networksetup', ['-setwebproxy', 'Wi-fi', 'off']);
+    const ps = spawn('networksetup', ['-setwebproxystate', 'Wi-fi', 'off']);
     logPs(ps);
 }
