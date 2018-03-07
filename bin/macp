@@ -1,0 +1,40 @@
+#!/usr/bin/env node
+
+const yargs = require('yargs');
+const {spawn} = require('child_process');
+
+const log = console.log; // eslint-disable-line
+const error = console.error; // eslint-disable-line
+
+yargs.usage(`Usage: macp
+    --port [proxy port]
+    --host [proxy host]
+    --on   [turn global proxy on]
+    --off  [turn global proxy off]
+    `).demandOption([]).help('h').alias('h', 'help');
+
+const {
+    argv
+} = yargs;
+
+const logPs = (ps) => {
+    ps.stdout.on('data', (data) => {
+        log(data);
+    });
+
+    ps.stderr.on('data', (data) => {
+        error(data);
+    });
+
+    ps.on('close', (code) => {
+        log(`process exited with code ${code}`);
+    });
+};
+
+if(argv.on) {
+    const ps = spawn('networksetup', ['-setwebproxy', 'Wi-fi', argv.host || '127.0.0.1', argv.port || '3130']);
+    logPs(ps);
+} else if(argv.off) {
+    const ps = spawn('networksetup', ['-setwebproxy', 'Wi-fi', 'off']);
+    logPs(ps);
+}

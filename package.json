@@ -1,0 +1,17 @@
+{
+  "name": "localhttpurlproxy",
+  "version": "0.0.1",
+  "description": "local http url proxy",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test/**/*.js"
+  },
+  "author": "ddchen",
+  "license": "MIT",
+  "devDependencies": {
+    "mocha": "^5.0.2"
+  },
+  "dependencies": {
+    "yargs": "^11.0.0"
+  }
+}
