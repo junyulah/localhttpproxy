@@ -1,13 +1,14 @@
 {
-  "name": "localhttpurlproxy",
+  "name": "localhttpproxy",
   "version": "0.0.1",
-  "description": "local http url proxy",
+  "description": "local http proxy",
   "main": "index.js",
   "scripts": {
     "test": "mocha test/**/*.js"
   },
   "bin": {
-    "macns": "./bin/macns"
+    "macns": "./bin/macns",
+    "lhp": "./bin/lhp"
   },
   "author": "ddchen",
   "license": "MIT",
