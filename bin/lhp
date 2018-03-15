@@ -55,7 +55,7 @@ const logHttp = () => {
 const serverIndexJs = path.join(__dirname, '../index.js');
 const startServer = () => {
     isAlive().catch(() => {
-        spawn('node', [serverIndexJs], {
+        spawn('node', [serverIndexJs, '&>', '/var/log/localhttpproxy.log'], {
             detached: true,
             stdio: 'ignore'
         });
