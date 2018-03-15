@@ -51,6 +51,12 @@ const pipeRequest = (reqOptions, req, res) => {
         });
     });
 
+    httpReq.on('error', (err) => {
+        res.statusCode = 500;
+        res.write(err.toString());
+        res.end();
+    });
+
     req.on('data', (chunk) => {
         httpReq.write(chunk);
     });
