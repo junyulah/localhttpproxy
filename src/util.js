@@ -1,3 +1,5 @@
+const http = require('http');
+
 const log = console.log; // eslint-disable-line
 const error = console.error; // eslint-disable-line
 
@@ -15,6 +17,57 @@ const logPs = (ps) => {
     });
 };
 
+const pipeRequest = (reqOptions, req, res, onEvent) => {
+    onEvent && onEvent('req-options', reqOptions);
+
+    const httpReq = http.request(reqOptions, (httpRes) => {
+        res.statusCode = httpRes.statusCode;
+        for (const name in httpRes.headers) {
+            res.setHeader(name, httpRes.headers[name]);
+        }
+        onEvent && onEvent('res-headers', {
+            statusCode: httpRes.statusCode,
+            headers: httpRes.headers
+        });
+
+        httpRes.on('data', (chunk) => {
+            onEvent && onEvent('res-data', chunk);
+            res.write(chunk);
+        });
+
+        httpRes.on('end', () => {
+            onEvent && onEvent('res-end');
+            res.end();
+        });
+    });
+
+    httpReq.on('error', (err) => {
+        res.statusCode = 500;
+        res.write(err.toString());
+        res.end();
+    });
+
+    req.on('data', (chunk) => {
+        onEvent && onEvent('req-data', chunk);
+        httpReq.write(chunk);
+    });
+
+    req.on('end', () => {
+        onEvent && onEvent('req-end');
+        httpReq.end();
+    });
+};
+
+const tryJSONFormat = (str) => {
+    try {
+        return JSON.parse(JSON.stringify(JSON.parse(str), null, 4));
+    } catch (err) {
+        return str;
+    }
+};
+
 module.exports = {
-    logPs
+    logPs,
+    pipeRequest,
+    tryJSONFormat
 };
