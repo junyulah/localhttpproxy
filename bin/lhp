@@ -5,6 +5,10 @@ const {spawn} = require('child_process');
 const path = require('path');
 const requestor = require('cl-requestor');
 const httpRequest = requestor('http');
+const fs = require('fs');
+const {promisify} = require('es6-promisify');
+
+const readFile = promisify(fs.readFile);
 
 const log = console.log; // eslint-disable-line
 const error = console.error; // eslint-disable-line
@@ -12,6 +16,7 @@ const error = console.error; // eslint-disable-line
 yargs.usage(`Usage: lhp
     status
     server
+    request --file [filepath]
     `).demandOption([]).help('h').alias('h', 'help');
 
 const {
@@ -76,4 +81,14 @@ if(argv._[0] === 'status') {
     startServer();
 } else if(argv._[0] === 'log') {
     logHttp();
+} else if(argv._[0] === 'request' && argv.file) {
+    const file = path.resolve(process.cwd(), argv.file);
+    readFile(file, 'utf-8').then((txt) => {
+        const {options, data} = JSON.parse(txt).request;
+        return httpRequest(options, typeof data === 'string'? data: JSON.stringify(data)).then(({body}) => {
+            log(body);
+        });
+    }).catch(err=>{
+        log(err);
+    });
 }
