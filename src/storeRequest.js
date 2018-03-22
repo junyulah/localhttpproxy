@@ -9,14 +9,13 @@ const fs = require('fs');
 const {
   coalesce
 } = require('./util');
-const requestor = require('cl-requestor');
 const {
   promisify
 } = require('es6-promisify');
 const mkdirp = promisify(require('mkdirp'));
+const http = require('http');
 
 const writeFile = promisify(fs.writeFile);
-const httpRequest = requestor('http');
 
 module.exports = (storeHostRules = [], urlPath) => {
   return coalesce(...storeHostRules.map((storeHostRule) => handleStoreHostRule(storeHostRule, urlPath)));
@@ -69,11 +68,14 @@ const storeToPath = (storeHostRule, urlPath, fullReqData) => {
   if (/^http:\/\//.test(url)) {
     const urlObject = urlParser.parse(url, false);
 
-    return httpRequest({
+    const httpReq = http.request({
       hostname: urlObject.hostname,
       port: urlObject.port,
-      path: urlObject.path
+      path: urlObject.path,
+      method: 'POST'
     });
+    httpReq.write(fullReqData);
+    httpReq.end();
   } else {
     const prefix = urlPath.replace(/\//g, '_') + '-';
     const fileName = prefix + (fileNameRule === 'uuid' ? uuidv4() : fileNameRule === 'time' ? new Date().toString() : 'tmp') + '.json';
