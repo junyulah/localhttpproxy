@@ -4,21 +4,19 @@ const uuidv4 = require('uuid/v4');
 const fs = require('fs');
 const {
   pipeRequest,
-  tryJSONFormat,
   forwardRequestDiscardResponse,
   coalesce
 } = require('./util');
 const {
   promisify
 } = require('es6-promisify');
-const mkdirp = promisify(require('mkdirp'));
-const path = require('path');
 const {
   getConfig
 } = require('./config');
 const _ = require('lodash');
+const matchHostPath = require('./matchHostPath');
+const storeRequest = require('./storeRequest');
 
-const writeFile = promisify(fs.writeFile);
 const readFile = promisify(fs.readFile);
 
 const getForwardOption = (req) => {
@@ -64,50 +62,6 @@ const logInHttp = (req, str) => {
 };
 
 // TODO pipe
-const storeRequest = (storeHostRule, urlPath) => {
-  if (matchHostPath(storeHostRule, urlPath)) {
-    const resChunks = [];
-    const reqChunks = [];
-    let requestOptions = null;
-    let responseHeaders = null;
-    const {
-      targetDir,
-      fileNameRule = 'uuid'
-    } = storeHostRule;
-
-    return (eventType, data) => {
-      if (eventType === 'req-options') {
-        requestOptions = data;
-      } else if (eventType === 'req-data') {
-        reqChunks.push(data.toString());
-      } else if (eventType === 'res-headers') {
-        responseHeaders = data;
-      } else if (eventType === 'res-data') {
-        resChunks.push(data.toString());
-      } else if (eventType === 'res-end') {
-        const prefix = urlPath.replace(/\//g, '_') + '-';
-        const fileName = prefix + (fileNameRule === 'uuid' ? uuidv4() : fileNameRule === 'time' ? new Date().toString() : 'tmp') + '.json';
-        // store to target file
-        mkdirp(targetDir).then(() => {
-          writeFile(path.join(targetDir, fileName), JSON.stringify({
-            request: {
-              options: requestOptions,
-              data: tryJSONFormat(reqChunks.join(''))
-            },
-            response: {
-              statusCode: responseHeaders.statusCode,
-              headers: responseHeaders.headers,
-              data: tryJSONFormat(resChunks.join(''))
-            }
-          }, null, 4), 'utf-8');
-        });
-      }
-    };
-  } else {
-    return null;
-  }
-};
-
 const injectorOnEvent = (injectorHostRule, urlPath) => {
   if (matchHostPath(injectorHostRule, urlPath)) {
     const {
@@ -140,10 +94,6 @@ const injectorOnEvent = (injectorHostRule, urlPath) => {
   } else {
     return null;
   }
-};
-
-const matchHostPath = (hostRule, urlPath) => {
-  return hostRule && (!hostRule.pathReg || new RegExp(hostRule.pathReg).test(urlPath));
 };
 
 getConfig().then((config) => {
