@@ -73,6 +73,8 @@ const storeToPath = (storeHostRule, urlPath, fullReqData) => {
       port: urlObject.port,
       path: urlObject.path,
       method: 'POST'
+    }).on('error', () => {
+      // TODO
     });
     httpReq.write(fullReqData);
     httpReq.end();

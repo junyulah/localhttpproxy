@@ -62,7 +62,7 @@ const logInHttp = (req, str) => {
 };
 
 // TODO pipe
-const injectorOnEvent = (injectorHostRule, urlPath) => {
+const injectorOnEvent = (req, injectorHostRule, urlPath) => {
   if (matchHostPath(injectorHostRule, urlPath)) {
     const {
       part,
@@ -76,6 +76,7 @@ const injectorOnEvent = (injectorHostRule, urlPath) => {
           res.setHeader('Transfer-Encoding', 'chunked');
         }
         if (part === 'response' && position === 'before') {
+          logInHttp(req, `[inject-before] inject ${urlPath} from ${contentFile}`)
           return readFile(contentFile, 'utf-8').then((str) => {
             res.write(str);
           });
@@ -101,7 +102,7 @@ getConfig().then((config) => {
     const urlObject = url.parse(req.url, false);
     const pipeOnEventHandler = coalesce(
       storeRequest(_.get(config, 'store.host', {})[req.headers.host], urlObject.path),
-      injectorOnEvent(_.get(config, 'injector.host', {})[req.headers.host], urlObject.path)
+      injectorOnEvent(req, _.get(config, 'injector.host', {})[req.headers.host], urlObject.path)
     );
 
     if (req.headers.host !== '127.0.0.1:3130') { // only consider other hosts than this server itself

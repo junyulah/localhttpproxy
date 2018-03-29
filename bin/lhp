@@ -1,12 +1,16 @@
 #!/usr/bin/env node
 
 const yargs = require('yargs');
-const {spawn} = require('child_process');
+const {
+  spawn
+} = require('child_process');
 const path = require('path');
 const requestor = require('cl-requestor');
 const httpRequest = requestor('http');
 const fs = require('fs');
-const {promisify} = require('es6-promisify');
+const {
+  promisify
+} = require('es6-promisify');
 
 const readFile = promisify(fs.readFile);
 
@@ -20,75 +24,82 @@ yargs.usage(`Usage: lhp
     `).demandOption([]).help('h').alias('h', 'help');
 
 const {
-    argv
+  argv
 } = yargs;
 
 const isAlive = () => {
-    return httpRequest({
-        hostname: '127.0.0.1',
-        port: 3130,
-        path: '/live'
-    }).then(({body}) => {
-        if(body !== 'I am alive') {
-            throw new Error('May be not our proxy server.');
-        }
-    });
+  return httpRequest({
+    hostname: '127.0.0.1',
+    port: 3130,
+    path: '/live'
+  }).then(({
+    body
+  }) => {
+    if (body !== 'I am alive') {
+      throw new Error('May be not our proxy server.');
+    }
+  });
 };
 
 const stopServer = () => {
-    return isAlive().then(() => {
-        return httpRequest({
-            hostname: '127.0.0.1',
-            port: 3130,
-            path: '/shutdown'
-        });
+  return isAlive().then(() => {
+    return httpRequest({
+      hostname: '127.0.0.1',
+      port: 3130,
+      path: '/shutdown'
     });
+  });
 };
 
 const logHttp = () => {
-    return requestor('http', {
-        chunkHandler: (chunk) => {
-            chunk && log(chunk.toString());
-        }
-    })({
-        hostname: '127.0.0.1',
-        port: 3130,
-        path: '/log'
-    });
+  return requestor('http', {
+    chunkHandler: (chunk) => {
+      chunk && log(chunk.toString());
+    }
+  })({
+    hostname: '127.0.0.1',
+    port: 3130,
+    path: '/log'
+  });
 };
 
 const serverIndexJs = path.join(__dirname, '../index.js');
 const startServer = () => {
-    isAlive().catch(() => {
-        spawn('node', [serverIndexJs, '&>', '/var/log/localhttpproxy.log'], {
-            detached: true,
-            stdio: 'ignore'
-        });
-
-        process.exit(0);
+  isAlive().catch(() => {
+    spawn('node', [serverIndexJs, '&>', '/var/log/localhttpproxy.log'], {
+      detached: true,
+      stdio: 'ignore'
     });
+
+    process.exit(0);
+  });
 };
 
-if(argv._[0] === 'status') {
-    isAlive().then(() => {
-        log('[normal]http proxy server run at http://127.0.0.1:3130');
-    }).catch((err) => {
-        log(`[error]http proxy server may down. Error msg ${err.toString()}`);
+if (argv._[0] === 'status') {
+  isAlive().then(() => {
+    log('[normal]http proxy server run at http://127.0.0.1:3130');
+  }).catch((err) => {
+    log(`[error]http proxy server may down. Error msg ${err.toString()}`);
+  });
+} else if (argv._[0] === 'server' && argv._[1] === 'stop') {
+  stopServer();
+} else if (argv._[0] === 'server') {
+  startServer();
+} else if (argv._[0] === 'log') {
+  logHttp();
+} else if (argv._[0] === 'request' && argv.file) {
+  const file = path.resolve(process.cwd(), argv.file);
+  readFile(file, 'utf-8').then((txt) => {
+    const {
+      options,
+      data
+    } = JSON.parse(txt).request;
+    return httpRequest(options, typeof data === 'string' ? data : JSON.stringify(data)).then(({
+      body
+    }) => {
+      log(body);
     });
-} else if(argv._[0] === 'server' && argv._[1] === 'stop') {
-    stopServer();
-} else if(argv._[0] === 'server') {
-    startServer();
-} else if(argv._[0] === 'log') {
-    logHttp();
-} else if(argv._[0] === 'request' && argv.file) {
-    const file = path.resolve(process.cwd(), argv.file);
-    readFile(file, 'utf-8').then((txt) => {
-        const {options, data} = JSON.parse(txt).request;
-        return httpRequest(options, typeof data === 'string'? data: JSON.stringify(data)).then(({body}) => {
-            log(body);
-        });
-    }).catch(err=>{
-        log(err);
-    });
+  }).catch(err => {
+    log(err);
+  });
 }
