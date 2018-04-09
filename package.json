@@ -1,6 +1,6 @@
 {
   "name": "localhttpproxy",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "local http proxy",
   "main": "index.js",
   "scripts": {
