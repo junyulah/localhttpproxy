@@ -76,7 +76,7 @@ const injectorOnEvent = (req, injectorHostRule, urlPath) => {
           res.setHeader('Transfer-Encoding', 'chunked');
         }
         if (part === 'response' && position === 'before') {
-          logInHttp(req, `[inject-before] inject ${urlPath} from ${contentFile}`)
+          logInHttp(req, `[inject-before] inject ${urlPath} from ${contentFile}`);
           return readFile(contentFile, 'utf-8').then((str) => {
             res.write(str);
           });

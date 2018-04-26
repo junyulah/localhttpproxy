@@ -16,3 +16,5 @@
 - modify response
 
 - current requestings inspect
+
+- easy way to proxy url from local file or local http request json file

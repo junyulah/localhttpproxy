@@ -95,8 +95,13 @@ if (argv._[0] === 'status') {
       data
     } = JSON.parse(txt).request;
     return httpRequest(options, typeof data === 'string' ? data : JSON.stringify(data)).then(({
-      body
+      body, headers, statusCode
     }) => {
+      log(`[status code]: ${statusCode}`);
+      log(`[headers]: ${JSON.stringify(headers, null, 4)}`);
+
+      // TODO decode body
+      log('[body]:');
       log(body);
     });
   }).catch(err => {
