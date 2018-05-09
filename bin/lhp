@@ -2,7 +2,7 @@
 
 const yargs = require('yargs');
 const {
-  spawn
+  exec
 } = require('child_process');
 const path = require('path');
 const requestor = require('cl-requestor');
@@ -65,11 +65,19 @@ const logHttp = () => {
 
 const serverIndexJs = path.join(__dirname, '../index.js');
 const startServer = () => {
-  isAlive().catch(() => {
-    spawn('node', [serverIndexJs, '&>', '/var/log/localhttpproxy.log'], {
-      detached: true,
-      stdio: 'ignore'
-    });
+  isAlive().then(() => {
+    log('server already started.');
+  }).catch(() => {
+    try {
+      exec(`node ${serverIndexJs} &`, {
+        detached: true,
+        stdio: 'ignore'
+      });
+
+      log('[log file] ~/localhosthttp.log');
+    } catch(err) {
+      log(`[fail] fail to start server. error message: ${err.message}`);
+    }
 
     process.exit(0);
   });
