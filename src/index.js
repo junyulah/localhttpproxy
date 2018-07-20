@@ -139,6 +139,8 @@ getConfig().then((config) => {
       } else if (req.url === '/shutdown') {
         res.end('about to shutdown');
         return process.exit(0);
+      } else if(req.url === '/config') {
+        res.end(JSON.stringify(config, null, 4));
       } else if (req.url === '/log') {
         const id = uuidv4();
         watchers[id] = {

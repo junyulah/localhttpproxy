@@ -30,7 +30,12 @@ const getConfig = () => {
       return {};
     } else {
       return readFile(configPath, 'utf-8').then((txt) => {
-        return JSON.parse(txt);
+        try {
+          return JSON.parse(txt);
+        } catch (err) {
+            console.log(err);
+            throw err;
+        }
       });
     }
   });

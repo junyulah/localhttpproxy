@@ -95,6 +95,16 @@ if (argv._[0] === 'status') {
   startServer();
 } else if (argv._[0] === 'log') {
   logHttp();
+} else if(argv._[0] === 'config') {
+  requestor('http', {
+    chunkHandler: (chunk) => {
+      chunk && log(chunk.toString());
+    }
+  })({
+    hostname: '127.0.0.1',
+    port: 3130,
+    path: '/config'
+  });
 } else if (argv._[0] === 'request' && argv.file) {
   const file = path.resolve(process.cwd(), argv.file);
   readFile(file, 'utf-8').then((txt) => {
