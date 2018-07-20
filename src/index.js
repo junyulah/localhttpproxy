@@ -57,7 +57,7 @@ const logInHttp = (req, str) => {
 
   for (const id in watchers) {
     const watcher = watchers[id];
-    watcher.res.write(req.url + '\n');
+    watcher.res.write(str);
   }
 };
 
