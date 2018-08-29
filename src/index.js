@@ -99,6 +99,8 @@ const injectorOnEvent = (req, injectorHostRule, urlPath) => {
 
 getConfig().then((config) => {
   const server = http.createServer((req, res) => {
+    req.setTimeout(20 * 60 * 1000);
+
     const urlObject = url.parse(req.url, false);
     const pipeOnEventHandler = coalesce(
       storeRequest(_.get(config, 'store.host', {})[req.headers.host], urlObject.path),
