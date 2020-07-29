@@ -13,13 +13,23 @@ const {
     writeTxt
   }
 } = require('general_lib');
+const _ = require('lodash');
 
-module.exports = (storeHostRules = [], urlPath) => {
-  return coalesce(...storeHostRules.map((storeHostRule) => handleStoreHostRule(storeHostRule, urlPath)));
+module.exports = ({
+  req,
+  config,
+  urlObject,
+  logInHttp
+}) => {
+  const storeHostRules = _.get(config, 'store.host', {})[req.headers.host] || [];
+  const urlPath = urlObject.path;
+
+  return coalesce(...storeHostRules.map((storeHostRule) => handleStoreHostRule(req, storeHostRule, urlPath, logInHttp)));
 };
 
-const handleStoreHostRule = (storeHostRule, urlPath) => {
+const handleStoreHostRule = (req, storeHostRule, urlPath, logInHttp) => {
   if (matchHostPath(storeHostRule, urlPath)) {
+    logInHttp(req, `[store] ${urlPath}`);
     const resChunks = [];
     const reqChunks = [];
     let requestOptions = null;

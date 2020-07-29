@@ -40,7 +40,12 @@ const startServer = async () => {
     const urlObject = url.parse(req.url, false);
 
     const pipeOnEventHandler = coalesce(
-      storeRequestMid(_.get(config, 'store.host', {})[req.headers.host], urlObject.path),
+      storeRequestMid({
+        req,
+        logInHttp,
+        config,
+        urlObject
+      }),
       injectorOnEventMid(req,
         _.get(config, 'injector.host', {})[req.headers.host],
         urlObject.path)
