@@ -1,5 +1,40 @@
 # localhttpproxy
 
+## install
+
+```
+npm i -g localhttpproxy
+```
+
+## command line
+
+```
+> lhp --help
+Usage: lhp
+    status
+    server
+    request --file [filepath]
+
+
+Options:
+  --version   Show version number                                      [boolean]
+  -h, --help  Show help                                                [boolean]
+```
+
+```
+> macns --help
+Usage: macns
+    --port [proxy port]
+    --host [proxy host]
+    --on   [turn global proxy on]
+    --off  [turn global proxy off]
+
+
+Options:
+  --version   Show version number                                      [boolean]
+  -h, --help  Show help                                                [boolean]
+```
+
 ## lhp config example
 
 ```json

@@ -1,13 +1,11 @@
-const matchHostPath = require('./matchHostPath');
 const path = require('path');
 const urlParser = require('url');
 const {
   tryJSONFormat,
-} = require('./util');
+  coalesce,
+  matchHostPath
+} = require('../util');
 const uuidv4 = require('uuid/v4');
-const {
-  coalesce
-} = require('./util');
 const mkdirp = require('mkdirp');
 const http = require('http');
 const {

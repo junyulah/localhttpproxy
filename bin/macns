@@ -13,16 +13,16 @@ yargs.usage(`Usage: macns
     `).demandOption([]).help('h').alias('h', 'help');
 
 const {
-    argv
+  argv
 } = yargs;
 
 if(argv.on) {
-    const ps = spawn('networksetup', ['-setwebproxy', 'Wi-fi', argv.host || '127.0.0.1', argv.port || '3130']);
-    logPs(ps);
+  const ps = spawn('networksetup', ['-setwebproxy', 'Wi-fi', argv.host || '127.0.0.1', argv.port || '3130']);
+  logPs(ps);
 } else if(argv.off) {
-    const ps = spawn('networksetup', ['-setwebproxystate', 'Wi-fi', 'off']);
-    logPs(ps);
+  const ps = spawn('networksetup', ['-setwebproxystate', 'Wi-fi', 'off']);
+  logPs(ps);
 } else {
-    const ps = spawn('networksetup', ['-getwebproxy', 'Wi-fi']);
-    logPs(ps);
+  const ps = spawn('networksetup', ['-getwebproxy', 'Wi-fi']);
+  logPs(ps);
 }

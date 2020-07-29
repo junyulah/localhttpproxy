@@ -1,4 +1,5 @@
 const http = require('http');
+const matchHostPath = require('./matchHostPath');
 
 const log = console.log; // eslint-disable-line
 const error = console.error; // eslint-disable-line
@@ -104,5 +105,6 @@ module.exports = {
   pipeRequest,
   forwardRequestDiscardResponse,
   tryJSONFormat,
-  coalesce
+  coalesce,
+  matchHostPath
 };

@@ -1,4 +1,6 @@
-const matchHostPath = require('./matchHostPath');
+const {
+  matchHostPath
+} = require('../util');
 const {
   fs: {
     readTxt
