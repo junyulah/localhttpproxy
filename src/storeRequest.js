@@ -5,17 +5,16 @@ const {
   tryJSONFormat,
 } = require('./util');
 const uuidv4 = require('uuid/v4');
-const fs = require('fs');
 const {
   coalesce
 } = require('./util');
-const {
-  promisify
-} = require('es6-promisify');
-const mkdirp = promisify(require('mkdirp'));
+const mkdirp = require('mkdirp');
 const http = require('http');
-
-const writeFile = promisify(fs.writeFile);
+const {
+  fs: {
+    writeTxt
+  }
+} = require('general_lib');
 
 module.exports = (storeHostRules = [], urlPath) => {
   return coalesce(...storeHostRules.map((storeHostRule) => handleStoreHostRule(storeHostRule, urlPath)));
@@ -59,7 +58,7 @@ const handleStoreHostRule = (storeHostRule, urlPath) => {
   }
 };
 
-const storeToPath = (storeHostRule, urlPath, fullReqData) => {
+const storeToPath = async (storeHostRule, urlPath, fullReqData) => {
   const {
     url,
     fileNameRule = 'uuid'
@@ -83,8 +82,7 @@ const storeToPath = (storeHostRule, urlPath, fullReqData) => {
     const fileName = prefix + (fileNameRule === 'uuid' ? uuidv4() : fileNameRule === 'time' ? new Date().toString() : 'tmp') + '.json';
 
     // store to target file
-    return mkdirp(url).then(() => {
-      writeFile(path.join(url, fileName), fullReqData, 'utf-8');
-    });
+    await mkdirp(url);
+    return writeTxt(path.join(url, fileName), fullReqData);
   }
 };

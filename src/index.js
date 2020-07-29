@@ -1,23 +1,25 @@
 const http = require('http');
 const url = require('url');
 const uuidv4 = require('uuid/v4');
-const fs = require('fs');
+const path = require('path');
 const {
   pipeRequest,
   forwardRequestDiscardResponse,
   coalesce
 } = require('./util');
-const {
-  promisify
-} = require('es6-promisify');
-const {
-  getConfig
-} = require('./config');
 const _ = require('lodash');
 const matchHostPath = require('./matchHostPath');
 const storeRequest = require('./storeRequest');
+const {
+  os: {
+    getUserHome
+  },
+  fs: {
+    readConfig,
+  }
+} = require('general_lib');
 
-const readFile = promisify(fs.readFile);
+const injectorOnEvent = require('./injectorOnEvent');
 
 const getForwardOption = (req) => {
   const urlObject = url.parse(req.url, false);
@@ -61,50 +63,19 @@ const logInHttp = (req, str) => {
   }
 };
 
-// TODO pipe
-const injectorOnEvent = (req, injectorHostRule, urlPath) => {
-  if (matchHostPath(injectorHostRule, urlPath)) {
-    const {
-      part,
-      position,
-      contentFile
-    } = injectorHostRule;
+const startServer = async () => {
+  const configPath = path.join(getUserHome(), 'lhp.config.json');
+  const config = await readConfig(configPath, {});
 
-    return (eventType, data, res) => {
-      if (eventType === 'res-headers') {
-        if (part === 'response') {
-          res.setHeader('Transfer-Encoding', 'chunked');
-        }
-        if (part === 'response' && position === 'before') {
-          logInHttp(req, `[inject-before] inject ${urlPath} from ${contentFile}`);
-          return readFile(contentFile, 'utf-8').then((str) => {
-            res.write(str);
-          });
-        }
-      }
-      if (eventType === 'res-data') {
-        //
-      } else if (eventType === 'res-end') {
-        if (part === 'response' && position === 'after') {
-          return readFile(contentFile, 'utf-8').then((str) => {
-            res.write(str);
-          });
-        }
-      }
-    };
-  } else {
-    return null;
-  }
-};
-
-getConfig().then((config) => {
   const server = http.createServer((req, res) => {
     req.setTimeout(20 * 60 * 1000);
 
     const urlObject = url.parse(req.url, false);
     const pipeOnEventHandler = coalesce(
       storeRequest(_.get(config, 'store.host', {})[req.headers.host], urlObject.path),
-      injectorOnEvent(req, _.get(config, 'injector.host', {})[req.headers.host], urlObject.path)
+      injectorOnEvent(req,
+        _.get(config, 'injector.host', {})[req.headers.host],
+        urlObject.path)
     );
 
     if (req.headers.host !== '127.0.0.1:3130') { // only consider other hosts than this server itself
@@ -141,7 +112,7 @@ getConfig().then((config) => {
       } else if (req.url === '/shutdown') {
         res.end('about to shutdown');
         return process.exit(0);
-      } else if(req.url === '/config') {
+      } else if (req.url === '/config') {
         res.end(JSON.stringify(config, null, 4));
       } else if (req.url === '/log') {
         const id = uuidv4();
@@ -162,4 +133,6 @@ getConfig().then((config) => {
   server.listen(3130, '127.0.0.1', () => {
     console.log(`server start at ${server.address().port}`); // eslint-disable-line
   });
-});
+};
+
+startServer();

@@ -20,3 +20,7 @@
 - easy way to proxy url from local file or local http request json file
 
 - server dev, post body (eg: scala)
+
+- TODO support websocket
+
+- UI client to modify lhp.config.json

@@ -19,7 +19,9 @@ const error = console.error; // eslint-disable-line
 
 yargs.usage(`Usage: lhp
     status
-    server
+    server [stop]
+    log
+    config
     request --file [filepath]
     `).demandOption([]).help('h').alias('h', 'help');
 
