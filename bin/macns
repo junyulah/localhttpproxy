@@ -5,7 +5,7 @@ const {spawn} = require('child_process');
 
 const {logPs} = require('../src/util');
 
-yargs.usage(`Usage: macp
+yargs.usage(`Usage: macns
     --port [proxy port]
     --host [proxy host]
     --on   [turn global proxy on]

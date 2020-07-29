@@ -33,8 +33,8 @@ const getConfig = () => {
         try {
           return JSON.parse(txt);
         } catch (err) {
-            console.log(err);
-            throw err;
+          console.log(err);
+          throw err;
         }
       });
     }
