@@ -1,6 +1,6 @@
 {
   "name": "localhttpproxy",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "local http proxy",
   "main": "index.js",
   "scripts": {
@@ -13,12 +13,12 @@
   "author": "ddchen",
   "license": "MIT",
   "devDependencies": {
-    "mocha": "^8.0.1"
+    "mocha": "^8.1.0"
   },
   "dependencies": {
     "cl-requestor": "0.0.3",
     "es6-promisify": "^6.0.0",
-    "general_lib": "^0.0.5",
+    "general_lib": "^0.0.6",
     "lodash": "^4.17.15",
     "mkdirp": "^1.0.4",
     "uuid": "^3.2.1",
