@@ -22,12 +22,19 @@ module.exports = async (file) => {
       protocol = 'http'
     } = (await readConfig(file)).request;
 
-    log('send', options);
+    if (data) {
+      options.headers = options.headers || {};
+      options.headers['Content-Length'] = data.length;
+    }
+
+    log('send-options', options);
+    const dataStr = typeof data === 'string' ? data : JSON.stringify(data);
+    log('send-data', dataStr);
     const {
       body,
       headers,
       statusCode
-    } = await requestor(protocol)(options, typeof data === 'string' ? data : JSON.stringify(data));
+    } = await requestor(protocol)(options, dataStr);
 
     log('res-status', statusCode);
     log('res-headers', JSON.stringify(headers, null, 4));
