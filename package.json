@@ -1,6 +1,6 @@
 {
   "name": "localhttpproxy",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "local http proxy",
   "main": "index.js",
   "scripts": {
@@ -18,7 +18,7 @@
   "dependencies": {
     "cl-requestor": "0.0.3",
     "es6-promisify": "^6.0.0",
-    "general_lib": "^0.0.6",
+    "general_lib": "^0.0.7",
     "lodash": "^4.17.15",
     "mkdirp": "^1.0.4",
     "uuid": "^3.2.1",

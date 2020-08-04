@@ -7,12 +7,7 @@ const {
 const path = require('path');
 const requestor = require('cl-requestor');
 const httpRequest = requestor('http');
-const fs = require('fs');
-const {
-  promisify
-} = require('es6-promisify');
-
-const readFile = promisify(fs.readFile);
+const sendRequest = require('../src/send');
 
 const log = console.log; // eslint-disable-line
 const error = console.error; // eslint-disable-line
@@ -88,46 +83,33 @@ const startServer = () => {
   });
 };
 
-if (argv._[0] === 'status') {
-  isAlive().then(() => {
-    log('[normal]http proxy server run at http://127.0.0.1:3130');
-  }).catch((err) => {
-    log(`[error]http proxy server may down. Error msg ${err.toString()}`);
-  });
-} else if (argv._[0] === 'server' && argv._[1] === 'stop') {
-  stopServer();
-} else if (argv._[0] === 'server') {
-  startServer();
-} else if (argv._[0] === 'log') {
-  logHttp();
-} else if(argv._[0] === 'config') {
-  requestor('http', {
-    chunkHandler: (chunk) => {
-      chunk && log(chunk.toString());
-    }
-  })({
-    hostname: '127.0.0.1',
-    port: 3130,
-    path: '/config'
-  });
-} else if (argv._[0] === 'request' && argv.file) {
-  const file = path.resolve(process.cwd(), argv.file);
-  readFile(file, 'utf-8').then((txt) => {
-    const {
-      options,
-      data
-    } = JSON.parse(txt).request;
-    return httpRequest(options, typeof data === 'string' ? data : JSON.stringify(data)).then(({
-      body, headers, statusCode
-    }) => {
-      log(`[status code]: ${statusCode}`);
-      log(`[headers]: ${JSON.stringify(headers, null, 4)}`);
-
-      // TODO decode body
-      log('[body]:');
-      log(body);
+const main = async () => {
+  if (argv._[0] === 'status') {
+    isAlive().then(() => {
+      log('[normal]http proxy server run at http://127.0.0.1:3130');
+    }).catch((err) => {
+      log(`[error]http proxy server may down. Error msg ${err.toString()}`);
     });
-  }).catch(err => {
-    log(err);
-  });
-}
+  } else if (argv._[0] === 'server' && argv._[1] === 'stop') {
+    stopServer();
+  } else if (argv._[0] === 'server') {
+    startServer();
+  } else if (argv._[0] === 'log') {
+    logHttp();
+  } else if(argv._[0] === 'config') {
+    requestor('http', {
+      chunkHandler: (chunk) => {
+        chunk && log(chunk.toString());
+      }
+    })({
+      hostname: '127.0.0.1',
+      port: 3130,
+      path: '/config'
+    });
+  } else if (argv._[0] === 'request' && argv.file) {
+    const file = path.resolve(process.cwd(), argv.file);
+    await sendRequest(file);
+  }
+};
+
+main();
