@@ -61,7 +61,10 @@ const logHttp = () => {
   })({
     hostname: '127.0.0.1',
     port: 3130,
-    path: '/log'
+    path: '/log',
+    headers: {
+      'connection': 'keep-alive'
+    }
   });
 };
 
