@@ -24,3 +24,5 @@
 - TODO support websocket
 
 - UI client to modify lhp.config.json
+
+- support form data

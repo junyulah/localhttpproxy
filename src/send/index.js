@@ -22,14 +22,14 @@ module.exports = async (file) => {
       protocol = 'http'
     } = (await readConfig(file)).request;
 
-    if (data) {
-      options.headers = options.headers || {};
-      options.headers['Content-Length'] = data.length;
-    }
-
     log('send-options', options);
     const dataStr = typeof data === 'string' ? data : JSON.stringify(data);
     log('send-data', dataStr);
+
+    if (dataStr) {
+      options.headers = options.headers || {};
+      options.headers['Content-Length'] = dataStr.length;
+    }
     const {
       body,
       headers,
