@@ -5,9 +5,13 @@ const {
   log: {
     log,
     logErr
+  },
+  net: {
+    http: {
+      request
+    }
   }
 } = require('general_lib');
-const requestor = require('cl-requestor');
 
 /**
  * send request
@@ -23,18 +27,17 @@ module.exports = async (file) => {
     } = (await readConfig(file)).request;
 
     log('send-options', options);
-    const dataStr = typeof data === 'string' ? data : JSON.stringify(data);
-    log('send-data', dataStr);
+    log('send-data', data);
 
-    if (dataStr) {
-      options.headers = options.headers || {};
-      options.headers['Content-Length'] = dataStr.length;
-    }
     const {
       body,
       headers,
       statusCode
-    } = await requestor(protocol)(options, dataStr);
+    } = await request({
+      protocol,
+      options,
+      data
+    });
 
     log('res-status', statusCode);
     log('res-headers', JSON.stringify(headers, null, 4));
