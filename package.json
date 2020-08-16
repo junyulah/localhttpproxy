@@ -16,9 +16,8 @@
     "mocha": "^8.1.1"
   },
   "dependencies": {
-    "es6-promisify": "^6.0.0",
     "general_lib": "^0.0.12",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.20",
     "mkdirp": "^1.0.4",
     "uuid": "^3.2.1",
     "yargs": "^15.4.1"
