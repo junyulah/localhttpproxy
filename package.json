@@ -16,7 +16,7 @@
     "mocha": "^8.1.1"
   },
   "dependencies": {
-    "general_lib": "^0.0.12",
+    "general_lib": "^0.0.14",
     "lodash": "^4.17.20",
     "mkdirp": "^1.0.4",
     "uuid": "^3.2.1",

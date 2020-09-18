@@ -26,8 +26,7 @@ module.exports = async (file) => {
       protocol = 'http'
     } = (await readConfig(file)).request;
 
-    log('send-options', options);
-    log('send-data', data);
+    const startTime = new Date();
 
     const {
       body,
@@ -36,13 +35,42 @@ module.exports = async (file) => {
     } = await request({
       protocol,
       options,
-      data
+      data,
+      beforeSend: (options, str) => {
+        log('send-options', options);
+        log('send-data', str);
+        log('curl-example', '\n' + toCurlCmd(protocol, options, str));
+      }
     });
 
+    const endTime = new Date();
+    log('process-time', `${(endTime.getTime() - startTime.getTime()) / 1000}s`);
     log('res-status', statusCode);
     log('res-headers', JSON.stringify(headers, null, 4));
-    log('res-body', body);
+    log('res-body', tryJson(body));
   } catch (err) {
     logErr('request-err', err);
   }
+};
+
+const tryJson = (body) => {
+  try {
+    return JSON.stringify(JSON.parse(body), null, 4);
+  } catch (err) {
+    return body;
+  }
+};
+
+const toCurlCmd = (protocol, options, str) => {
+  const headers = options.headers || {};
+  const headerLines = [];
+  for (let key in headers) {
+    const value = headers[key];
+    const kv = `${key}: ${value}`;
+    headerLines.push(`-H ${JSON.stringify(kv)}`);
+  }
+  const url = `${protocol}://${options.host}:${options.port}${options.path}`;
+  return `curl -X ${options.method || 'GET'} ${url} \\
+${headerLines.join(' \\\n')} \\
+--data ${JSON.stringify(str)}`;
 };
